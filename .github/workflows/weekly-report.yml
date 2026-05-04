@@ -9,6 +9,7 @@ jobs:
   report:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: feishubot
 
     steps:
       - name: Checkout
