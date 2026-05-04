@@ -1,0 +1,46 @@
+name: SGLang Weekly Report
+
+on:
+  schedule:
+    - cron: '0 1 * * 1'   # Monday 09:00 CST (UTC+8 → UTC 01:00)
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install feishu-mcp
+        run: npm install -g feishu-mcp
+
+      - name: Run weekly report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_MODEL: deepseek-v4-flash
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_FOLDER_TOKEN: ${{ secrets.FEISHU_FOLDER_TOKEN }}
+          FEISHU_CHAT_ID: ${{ secrets.FEISHU_CHAT_ID }}
+          FEISHU_DOMAIN: ${{ secrets.FEISHU_DOMAIN }}
+          GITHUB_REPO: sgl-project/sglang
+          DAYS_LOOKBACK: 7
+        run: python main.py
