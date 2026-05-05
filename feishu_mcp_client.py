@@ -84,12 +84,15 @@ def _write_blocks(doc_id: str, blocks: list, token: str) -> int:
     for i in range(0, len(blocks), _BATCH_SIZE):
         chunk = blocks[i: i + _BATCH_SIZE]
         resp = requests.post(url, headers=headers,
-                             data=json.dumps({"children": chunk, "index": i}, ensure_ascii=False).encode("utf-8"),
+                             data=json.dumps({"children": chunk, "index": total}, ensure_ascii=False).encode("utf-8"),
                              timeout=30)
-        resp.raise_for_status()
+        if not resp.ok:
+            raise RuntimeError(
+                f"Block write HTTP {resp.status_code} (batch offset={total}, size={len(chunk)}): {resp.text[:2000]}"
+            )
         data = resp.json()
         if data.get("code") != 0:
-            raise RuntimeError(f"Block write failed (batch {i}): {data}")
+            raise RuntimeError(f"Block write failed (batch {total}): {data}")
         total += len(chunk)
     return total
 
