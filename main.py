@@ -19,7 +19,7 @@ from github_fetcher import fetch_commits, fetch_issues
 from summarizer import summarize
 from feishu_sender import send_report
 from feishu_mcp_client import create_and_write_doc
-from config import FEISHU_APP_ID, FEISHU_APP_SECRET
+from config import FEISHU_APP_ID, FEISHU_APP_SECRET, REPOS, DAYS_LOOKBACK
 
 logging.basicConfig(
     level=logging.INFO,
@@ -44,30 +44,28 @@ def _extract_overview(report: str) -> str:
     return '\n'.join(overview).strip()
 
 
-def run(dry_run=False):
-    log.info("Fetching commits from sglang/main …")
-    commits = fetch_commits()
+def _run_repo(repo: str, folder_token: str, dry_run=False):
+    log.info("=== %s ===", repo)
+    log.info("Fetching commits …")
+    commits = fetch_commits(repo=repo)
     log.info("Fetched %d commits", len(commits))
 
     log.info("Fetching issues …")
-    opened, closed = fetch_issues()
+    opened, closed = fetch_issues(repo=repo)
     log.info("Opened: %d  Closed: %d", len(opened), len(closed))
 
-    log.info("Summarizing with Claude …")
-    report = summarize(commits, opened, closed)
+    log.info("Summarizing …")
+    report = summarize(commits, opened, closed, repo=repo, days=DAYS_LOOKBACK)
 
     print("\n" + "=" * 60)
     print(report)
     print("=" * 60 + "\n")
 
     if dry_run:
-        log.info("Dry-run complete — report printed above, not sent to Feishu.")
         return
 
-    # Write full report to Feishu Doc (requires app credentials)
     doc_url = None
     if FEISHU_APP_ID and FEISHU_APP_SECRET:
-        # Extract the first ## heading as the doc title; use the rest as body
         lines = report.strip().splitlines()
         doc_title = None
         body_start = 0
@@ -79,20 +77,26 @@ def run(dry_run=False):
                 break
         if not doc_title:
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            doc_title = f"SGLang 周报 · {today}"
+            doc_title = f"{repo.split('/')[-1]} 周报 · {today}"
         doc_body = "\n".join(lines[body_start:]).lstrip("\n")
         log.info("Creating Feishu doc '%s' …", doc_title)
-        doc_info = create_and_write_doc(doc_title, doc_body)
+        doc_info = create_and_write_doc(doc_title, doc_body, folder_token=folder_token)
         doc_url = doc_info["doc_url"]
         log.info("Doc created: %s (%d blocks)", doc_url, doc_info["blocks_written"])
-    else:
-        log.info("Skipping Feishu doc (FEISHU_APP_ID/SECRET/FOLDER_TOKEN not set)")
 
     overview = _extract_overview(report)
     log.info("Sending card to Feishu group …")
     result = send_report(overview, len(commits), len(opened), len(closed), doc_url=doc_url)
     log.info("Feishu response: %s", result)
-    log.info("Done.")
+
+
+def run(dry_run=False):
+    for repo_cfg in REPOS:
+        _run_repo(repo_cfg["repo"], repo_cfg["folder_token"], dry_run=dry_run)
+    if dry_run:
+        log.info("Dry-run complete.")
+    else:
+        log.info("All repos done.")
 
 
 def _next_monday_9am_cst():

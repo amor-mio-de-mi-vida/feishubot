@@ -14,3 +14,8 @@ FEISHU_CHAT_ID = os.getenv("FEISHU_CHAT_ID", "")
 FEISHU_DOMAIN = os.getenv("FEISHU_DOMAIN", "docs.feishu.cn")
 
 DAYS_LOOKBACK = int(os.getenv("DAYS_LOOKBACK", "7"))  # 7 = weekly
+
+REPOS = [
+    {"repo": GITHUB_REPO, "folder_token": FEISHU_FOLDER_TOKEN},
+    {"repo": "vllm-project/vllm", "folder_token": os.getenv("VLLM_FEISHU_FOLDER_TOKEN", "")},
+]

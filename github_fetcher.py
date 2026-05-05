@@ -31,9 +31,10 @@ def _paginate(url, params):
                 break
 
 
-def fetch_commits():
+def fetch_commits(repo=None):
     since = _since_iso()
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/commits"
+    repo = repo or GITHUB_REPO
+    url = f"https://api.github.com/repos/{repo}/commits"
     params = {"sha": "main", "since": since, "per_page": 100}
     commits = []
     for item in _paginate(url, params):
@@ -47,9 +48,10 @@ def fetch_commits():
     return commits
 
 
-def fetch_issues():
+def fetch_issues(repo=None):
     since = _since_iso()
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/issues"
+    repo = repo or GITHUB_REPO
+    url = f"https://api.github.com/repos/{repo}/issues"
 
     # Newly opened issues (updated since = covers newly created ones)
     params = {"state": "open", "since": since, "per_page": 100, "sort": "created", "direction": "desc"}

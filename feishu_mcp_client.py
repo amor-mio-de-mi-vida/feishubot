@@ -47,13 +47,14 @@ def _server_params():
     )
 
 
-async def _create_doc(title: str) -> tuple:
+async def _create_doc(title: str, folder_token: str = None) -> tuple:
     async with stdio_client(_server_params()) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
             create_args = {"title": title}
-            if FEISHU_FOLDER_TOKEN:
-                create_args["folderToken"] = FEISHU_FOLDER_TOKEN
+            ft = folder_token or FEISHU_FOLDER_TOKEN
+            if ft:
+                create_args["folderToken"] = ft
             r = await session.call_tool("create_feishu_document", create_args)
             text = r.content[0].text if r.content else ""
             if r.isError or text.startswith("创建文档失败"):
@@ -97,8 +98,8 @@ def _write_blocks(doc_id: str, blocks: list, token: str) -> int:
     return total
 
 
-async def _create_and_write(title: str, blocks: list) -> dict:
-    doc_id, doc_url = await _create_doc(title)
+async def _create_and_write(title: str, blocks: list, folder_token: str = None) -> dict:
+    doc_id, doc_url = await _create_doc(title, folder_token=folder_token)
     token = _tenant_token()
     total = _write_blocks(doc_id, blocks, token)
     return {"doc_id": doc_id, "doc_url": doc_url, "blocks_written": total}
@@ -214,7 +215,7 @@ def md_to_feishu_blocks(md: str) -> list:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-def create_and_write_doc(title: str, markdown: str) -> dict:
+def create_and_write_doc(title: str, markdown: str, folder_token: str = None) -> dict:
     """Synchronous wrapper — creates doc via feishu-mcp, writes blocks via direct API."""
     blocks = md_to_feishu_blocks(markdown)
-    return asyncio.run(_create_and_write(title, blocks))
+    return asyncio.run(_create_and_write(title, blocks, folder_token=folder_token))

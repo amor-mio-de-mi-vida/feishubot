@@ -40,6 +40,7 @@ jobs:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_FOLDER_TOKEN: ${{ secrets.FEISHU_FOLDER_TOKEN }}
+          VLLM_FEISHU_FOLDER_TOKEN: ${{ secrets.VLLM_FEISHU_FOLDER_TOKEN }}
           FEISHU_CHAT_ID: ${{ secrets.FEISHU_CHAT_ID }}
           FEISHU_DOMAIN: ${{ secrets.FEISHU_DOMAIN }}
           GITHUB_REPO: sgl-project/sglang

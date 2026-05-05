@@ -22,7 +22,9 @@ def _issue_text(issues, label):
     return f"### {label}\n" + ("\n".join(lines) if lines else "None.")
 
 
-def summarize(commits, opened_issues, closed_issues):
+def summarize(commits, opened_issues, closed_issues, repo=None, days=None):
+    repo = repo or GITHUB_REPO
+    days = days or DAYS_LOOKBACK
     commit_block = _commit_text(commits)
     issue_block = (
         _issue_text(opened_issues, "Newly Opened Issues")
@@ -30,9 +32,9 @@ def summarize(commits, opened_issues, closed_issues):
         + _issue_text(closed_issues, "Recently Closed Issues")
     )
 
-    prompt = f"""You are a technical analyst for the open-source project **{GITHUB_REPO}** (a fast LLM serving framework).
+    prompt = f"""You are a technical analyst for the open-source project **{repo}** (a fast LLM serving framework).
 
-Below is the activity on the **main** branch over the past **{DAYS_LOOKBACK} days**.
+Below is the activity on the **main** branch over the past **{days} days**.
 
 ## Commits ({len(commits)} total)
 {commit_block}
@@ -44,7 +46,7 @@ Please produce a structured weekly report in **Chinese** with the following sect
 
 **Output rules**:
 - Do NOT add any preamble, greeting, or introductory sentence before the report.
-- The very first line must be the title: `## SGLang 技术周报 (YYYY-MM-DD ~ YYYY-MM-DD)` (fill in the actual date range from the commit dates).
+- The very first line must be the title: `## {repo.split("/")[-1]} 技术周报 (YYYY-MM-DD ~ YYYY-MM-DD)` (fill in the actual date range from the commit dates).
 - Use only standard Markdown: `##` / `###` / `####` headings, `-` bullet lists, `[text](url)` links, and `**bold**`. Do NOT use HTML or tables.
 - Section 2 lists **only important commits**: major new features, significant performance improvements, and noteworthy bug fixes. Skip CI changes, doc-only updates, minor refactors, and trivial fixes entirely.
 - **Commit entry format** (single tier for all listed commits):
