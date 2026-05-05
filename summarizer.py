@@ -46,22 +46,17 @@ Please produce a structured weekly report in **Chinese** with the following sect
 - Do NOT add any preamble, greeting, or introductory sentence before the report.
 - The very first line must be the title: `## SGLang 技术周报 (YYYY-MM-DD ~ YYYY-MM-DD)` (fill in the actual date range from the commit dates).
 - Use only standard Markdown: `##` / `###` / `####` headings, `-` bullet lists, `[text](url)` links, and `**bold**`. Do NOT use HTML or tables.
-- **Every commit must appear** in section 2, grouped by category. Do not skip any commit.
-- **Commit entry format** — two tiers:
-
-  Tier 1 — regular commit (minor fix, CI change, doc update, small refactor):
-  `- [sha](full_commit_url) commit title (#PR) - 一句简短中文说明`
-  Keep the Chinese part to one concise sentence.
-
-  Tier 2 — important commit (major feature, significant perf improvement, critical bug fix, key refactor):
+- Section 2 lists **only important commits**: major new features, significant performance improvements, and noteworthy bug fixes. Skip CI changes, doc-only updates, minor refactors, and trivial fixes entirely.
+- **Commit entry format** (single tier for all listed commits):
   `- [sha](full_commit_url) **commit title (#PR)** - 详细中文分析（2-3句）`
   Bold the title. Write 2-3 sentences explaining: what problem it solves, the technical approach, and why developers should care.
 
-  Example Tier 2:
+  Example:
   `- [62265ca](url) **[diffusion] feat: initial support for dynamic batching (#18764)** - 此前扩散模型每次只能处理单个请求，GPU利用率极低；动态批处理允许多请求合并执行，在并发服务场景下吞吐量可提升数倍。开发者部署时需开启对应参数，对实时图像/视频服务影响显著。`
 
 - **Commit category headers** use `####` with emoji prefix:
-  `#### 🚀 性能优化`, `#### 🐛 Bug 修复`, `#### ✨ 新功能`, `#### 📝 文档/测试/CI`, `#### 🔧 重构`, `#### 🧹 其他`
+  `#### 🚀 性能优化`, `#### 🐛 Bug 修复`, `#### ✨ 新功能`, `#### 🔧 重构`
+  Omit a category entirely if there are no important commits in it.
 - **Issue 动态** sub-headers use `####`:
   `#### 新开 Issue 主题概览` (group by theme, cite issue numbers inline like `(#12345)`)
   `#### 重要关闭 Issue` (list as `- #number - 标题: 解决说明`)
@@ -76,8 +71,8 @@ Sections:
 ### 1. 本周概览
 3-5 sentences: total commit count, most significant themes with numbers, and why these matter.
 
-### 2. 提交分类
-Cover ALL commits grouped by category. Use Tier 2 (bold + detailed) for every technically significant commit.
+### 2. 重要提交
+Only important commits (major features, significant perf improvements, noteworthy bug fixes), grouped by category. Each entry uses the bold + 2-3 sentence format. Skip minor/CI/doc commits.
 
 ### 3. Issue 动态
 Comprehensive: all major themes for new issues (with specific #numbers), then important closed issues.
