@@ -39,9 +39,9 @@ def _md_chunks(text: str):
     return chunks
 
 
-def _build_card(overview: str, commit_count: int, opened_count: int, closed_count: int, doc_url: str = None) -> dict:
+def _build_card(overview: str, commit_count: int, opened_count: int, closed_count: int, doc_url: str = None, repo: str = None) -> dict:
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    repo_link = _repo_url()
+    repo_name = (repo or GITHUB_REPO).split("/")[-1]
 
     elements = [
         {
@@ -75,19 +75,19 @@ def _build_card(overview: str, commit_count: int, opened_count: int, closed_coun
     return {
         "config": {"wide_screen_mode": True},
         "header": {
-            "title": {"tag": "plain_text", "content": f"SGLang 周报 · {today}"},
+            "title": {"tag": "plain_text", "content": f"{repo_name} 周报 · {today}"},
             "template": "blue",
         },
         "elements": elements,
     }
 
 
-def send_report(overview: str, commit_count: int, opened_count: int, closed_count: int, doc_url: str = None):
+def send_report(overview: str, commit_count: int, opened_count: int, closed_count: int, doc_url: str = None, repo: str = None):
     if not FEISHU_CHAT_ID:
         raise ValueError("FEISHU_CHAT_ID is not set — run with --list-chats to find your group ID")
 
     token = _tenant_token()
-    card = _build_card(overview, commit_count, opened_count, closed_count, doc_url=doc_url)
+    card = _build_card(overview, commit_count, opened_count, closed_count, doc_url=doc_url, repo=repo)
 
     payload = {
         "receive_id": FEISHU_CHAT_ID,

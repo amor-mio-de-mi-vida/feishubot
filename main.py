@@ -86,7 +86,7 @@ def _run_repo(repo: str, folder_token: str, dry_run=False):
 
     overview = _extract_overview(report)
     log.info("Sending card to Feishu group …")
-    result = send_report(overview, len(commits), len(opened), len(closed), doc_url=doc_url)
+    result = send_report(overview, len(commits), len(opened), len(closed), doc_url=doc_url, repo=repo)
     log.info("Feishu response: %s", result)
 
 
