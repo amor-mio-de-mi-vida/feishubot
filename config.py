@@ -15,7 +15,11 @@ FEISHU_DOMAIN = os.getenv("FEISHU_DOMAIN", "docs.feishu.cn")
 
 DAYS_LOOKBACK = int(os.getenv("DAYS_LOOKBACK", "7"))  # 7 = weekly
 
-REPOS = [
-    {"repo": GITHUB_REPO, "folder_token": FEISHU_FOLDER_TOKEN},
-    {"repo": "vllm-project/vllm", "folder_token": os.getenv("VLLM_FEISHU_FOLDER_TOKEN", "")},
+_ALL_REPOS = [
+    {"key": "sglang", "repo": GITHUB_REPO,          "folder_token": FEISHU_FOLDER_TOKEN},
+    {"key": "vllm",   "repo": "vllm-project/vllm",  "folder_token": os.getenv("VLLM_FEISHU_FOLDER_TOKEN", "")},
 ]
+
+# REPOS_TO_RUN: "sglang" | "vllm" | "both" (default)
+_run = os.getenv("REPOS_TO_RUN", "both").lower()
+REPOS = [r for r in _ALL_REPOS if _run == "both" or r["key"] == _run]

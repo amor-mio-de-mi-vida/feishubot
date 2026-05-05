@@ -3,7 +3,17 @@ name: SGLang Weekly Report
 on:
   schedule:
     - cron: '0 1 * * 1'   # Monday 09:00 CST (UTC+8 → UTC 01:00)
-  workflow_dispatch:        # allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      repos:
+        description: 'Which repos to run'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - sglang
+          - vllm
 
 jobs:
   report:
@@ -45,4 +55,5 @@ jobs:
           FEISHU_DOMAIN: ${{ secrets.FEISHU_DOMAIN }}
           GITHUB_REPO: sgl-project/sglang
           DAYS_LOOKBACK: 7
+          REPOS_TO_RUN: ${{ github.event_name == 'schedule' && 'both' || inputs.repos }}
         run: python main.py
