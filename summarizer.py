@@ -78,7 +78,21 @@ Only important commits (major features, significant perf improvements, noteworth
 Comprehensive: all major themes for new issues (with specific #numbers), then important closed issues.
 
 ### 4. 重点关注
-Top 3 most impactful changes. Explanations should be detailed and actionable."""
+You MUST output exactly 3 numbered items (1, 2, 3). Each item uses this exact multi-line format:
+
+1. [Category] 标题 (#PR)
+commit: [sha](url)
+3-4句中文详细说明：改了什么、为什么重要、开发者应该怎么做。
+
+2. [Category] 标题 (#PR)
+commit: [sha](url)
+3-4句中文详细说明。
+
+3. [Category] 标题 (#PR)
+commit: [sha](url)
+3-4句中文详细说明。
+
+Do NOT collapse items or stop after item 1. All 3 items are required."""
 
     response = client.chat.completions.create(
         model=DEEPSEEK_MODEL,
